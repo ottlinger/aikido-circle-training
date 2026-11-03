@@ -1,6 +1,10 @@
+<p align="center"><img src="assets/logo.png" width="128" height="128" alt="Aiki-Logo: 合気 im Kreis"></p>
+
 # Aikidō Circle Training · Keiko 稽古
 
 **Deutsch** | [English](README.en.md)
+
+[![Tests](https://github.com/ottlinger/aikido-circle-training/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/ottlinger/aikido-circle-training/actions/workflows/tests.yml)
 
 Eine lokale JavaScript-Anwendung zur Visualisierung des Aikidō-Trainingskreises. Geübt wird **immer zwischen zwei Partnern** (Nage und Uke); der Kreis organisiert das Training aller mit allen. Keine personenbezogenen Daten, kein Backend, keine externen Bibliotheken oder Netzwerkanfragen. Im Footer führt ein GitHub-Link mit Octocat-Logo zum [Quellcode](https://github.com/ottlinger/aikido-circle-training).
 
@@ -45,6 +49,15 @@ Im Uke-Modus besucht Partner 1 ebenfalls **2 → 3 → 4 → 5**, greift jeden z
 
 Für die nächste Runde müssen alle anderen einen für die vorherige Runde besucht haben. Der Startpartner eröffnet die neue Welle; die Nachfolger steigen erneut ein, wenn ihr direkter Vorgänger mit ihnen geübt hat. So bleibt auch über mehrere Zyklen hinweg der Abstand erhalten. Eingehende abgeschlossene Partnerübungen werden pro vorbeikommendem Teilnehmer gezählt. Ein Simulationsschritt ist ein Wurf **je aktuellem Paar**; nach der letzten Wiederholung werden die nächsten konfliktfreien Paare gebildet. Die Rückkehr wird mindestens einen Zustand lang gezeigt. Falls gerade alle zurückkehren, ist der nächste Schritt ein Partnerwechsel ohne Wurf.
 
+## Projektlogo auf GitHub
+
+- `assets/logo.svg`: skalierbares Aiki-Kreislogo. Die Kanji **合気** sind Vektorpfade; es werden keine japanischen Schriftarten benötigt. Anwendung und Favicon verwenden dieselbe Datei.
+- `assets/logo.png`: 512 × 512 Pixel mit transparenten Ecken; als Projektlogo oben in beiden READMEs eingebunden.
+- `assets/favicon.png`: 32 × 32 Pixel; `assets/favicon.ico`: 16, 32 und 48 Pixel. Beide sind neben dem SVG-Favicon als Fallbacks in `index.html` verlinkt.
+- `assets/social-preview.png`: 1280 × 640 Pixel, vorbereitet für GitHubs Social Preview (unter 1 MB).
+
+GitHub hat kein separates Repository-Avatar-Feld. Für das Vorschaubild den Repository-Bereich **Settings → General → Social preview → Edit → Upload an image** öffnen und `assets/social-preview.png` hochladen. Der Upload lässt sich nicht über die reguläre GitHub-API oder `gh repo edit` setzen.
+
 ## Dateien und Tests
 
 - `index.html`: Oberfläche und SVG-Trainingskreis
@@ -60,5 +73,7 @@ Mit Node.js (18 oder neuer):
 ```sh
 node --test tests/*.test.cjs
 ```
+
+Die GitHub Action `.github/workflows/tests.yml` prüft bei jedem Push und Pull Request die JavaScript-Syntax und führt sämtliche Tests auf **Node.js 18, 22 und 24** aus. Sie kann auch manuell gestartet werden. Das Badge oben zeigt den tatsächlichen Status der Tests auf `main` – grün nach einem erfolgreichen Lauf.
 
 Die Tests prüfen **beide Modi**, alle Gruppengrößen, beide Richtungen und beide Wiederholungszahlen über mehrere Runden: keine Doppelbelegung, kein Überholen, keine Rollenwechsel während einer inneren Runde, korrekte Reihenfolge, Einstieg nur durch den direkten Vorgänger, Wartebedingung, sichtbare Rückkehr und kein Stillstand. Der bestätigte Ablauf „Partner 1 wirft alle, kommt zurück und wird zuerst von Partner 2 geworfen“ und die Variante mit angreifendem Uke sind ausdrücklich getestet. Zählertests prüfen jede ausgeführte/verbleibende Wiederholung. Layouttests prüfen die feste und die innere Position, korrekte Nage/Uke-Zuordnung, eindeutige Paarfarben und genau eine Figur pro Person. Übersetzungstests prüfen Deutsch als Standard, vollständige Sprachkataloge, identische Platzhalter, statische und dynamische Texte, Screenreader-Beschriftungen und sprachabhängige Zahlenformate.
