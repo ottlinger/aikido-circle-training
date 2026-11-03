@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#142c2a">
+  <title>Keiko – Aikido Trainingskreis</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="simulation.js" defer></script>
+  <script src="visualization.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="page-header">
+    <div class="brand-mark" aria-hidden="true" lang="ja">合気</div>
+    <div><p class="eyebrow">AIKIDO · GEMEINSAM IN BEWEGUNG</p><h1>Der Trainingskreis</h1></div>
+    <span class="local-badge">Lokal. Ohne persönliche Daten.</span>
+  </header>
+
+  <main>
+    <section class="controls card" aria-labelledby="settings-title">
+      <div class="section-heading"><span class="eyebrow">DEIN KEIKO</span><h2 id="settings-title">Training gestalten</h2></div>
+      <div class="field">
+        <label for="count">Teilnehmer <output id="count-value" for="count"></output></label>
+        <input id="count" type="range" min="3" max="20" value="8">
+        <button id="randomize" class="quiet" type="button">↻ Zufällige Gruppe</button>
+      </div>
+      <div class="field"><label for="direction">Richtung</label><select id="direction"><option value="1">↻ Im Uhrzeigersinn</option><option value="-1">↺ Gegen den Uhrzeigersinn</option></select></div>
+      <div class="field"><label for="repetitions">Würfe pro Partner</label><select id="repetitions"><option value="2">2 Würfe</option><option value="4">4 Würfe</option></select></div>
+      <div class="field"><label for="starter">Startpartner</label><select id="starter"></select></div>
+      <div class="field"><label for="speed">Tempo <output id="speed-value" for="speed">1×</output></label><input id="speed" type="range" min="0.5" max="3" step="0.5" value="1"></div>
+      <p class="hint">Änderungen an Gruppe, Richtung oder Würfen beginnen ein neues Training.</p>
+      <div class="buttons"><button id="play" class="primary" type="button">▶ Starten</button><button id="step" type="button">Ein Schritt</button><button id="reset" class="quiet" type="button">Zurücksetzen</button></div>
+    </section>
+
+    <section class="visual card" aria-labelledby="circle-title">
+      <div class="visual-heading"><div><p class="eyebrow">DIE BEWEGUNG IM KREIS</p><h2 id="circle-title">Ein Partner. Eine neue Welle.</h2></div><span id="status" class="status" role="status">Bereit</span></div>
+      <div class="starter-summary"><strong id="starter-progress"></strong><span id="starter-state"></span></div>
+      <div class="circle-wrap">
+        <svg id="circle" viewBox="0 0 640 640" role="img" aria-labelledby="svg-title svg-description">
+          <title id="svg-title">Aikido-Trainingskreis</title>
+          <desc id="svg-description">Nage bewegt sich im Kreisinneren, Uke bleibt am nummerierten Kreisplatz. Jedes aktive Zweierpaar hat eine eigene gemeinsame Farbe. N kennzeichnet Nage, U kennzeichnet Uke. Nach seiner Runde kehrt Nage zum Startplatz zurück. Die aktuellen Paare stehen auch in der Paarliste.</desc>
+          <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#dca35e"/></marker></defs>
+          <circle cx="320" cy="320" r="247" class="mat-outer"/>
+          <circle cx="320" cy="320" r="207" class="mat-inner"/>
+          <path d="M 320 73 A 247 247 0 0 1 567 320" class="direction-guide" id="direction-guide" marker-end="url(#arrow)"/>
+          <text x="320" y="298" class="center-label" text-anchor="middle" lang="ja" aria-label="Keiko">稽古</text>
+          <text x="320" y="329" class="center-subtitle" text-anchor="middle" id="center-count"></text>
+          <text x="320" y="353" class="center-subtitle" text-anchor="middle" id="center-direction"></text>
+          <g id="home-positions"></g><g id="connections"></g><g id="participants"></g>
+        </svg>
+      </div>
+      <div class="legend"><span><i class="dot pair-color"></i>Gleiche Farbe = ein Paar</span><span><b>N</b> Nage · innen</span><span><b>U</b> Uke · am Kreisplatz</span><span><i class="dot waiting"></i>Zurück / wartet</span><span><i class="dot home"></i>Freier Startplatz</span></div>
+      <div class="stats"><div><strong id="throws-stat">0</strong><span>Würfe insgesamt</span></div><div><strong id="pairs-stat">0</strong><span>Partnerübungen beendet</span></div><div><strong id="cycles-stat">0</strong><span>Runden aller Teilnehmer</span></div></div>
+    </section>
+
+    <section class="activity card" aria-labelledby="activity-title"><p class="eyebrow">AUF DER MATTE</p><h2 id="activity-title">Aktuelle Paare</h2><div id="current-pairs" class="pair-list"></div><h3>Teilnehmer & Fortschritt</h3><div id="progress-list" class="progress-list"></div></section>
+    <section class="explanation card" aria-labelledby="rules-title"><p class="eyebrow">SO FUNKTIONIERT’S</p><h2 id="rules-title">Eine Welle wird zum Kreis.</h2><p>Geübt wird immer zu zweit: Nage wirft, Uke wird geworfen. Der Kreis organisiert die Partnerwechsel – so trainieren alle mit allen.</p><ol><li>Der Startpartner übt mit dem nächsten Nachbarn – jeweils 2 oder 4 Würfe.</li><li>Sobald er weitergeht, folgt der erste geworfene Partner mit Abstand. Partner 3 folgt erst, nachdem Partner 2 ihn geworfen hat – nicht schon nach dem Wurf von Partner 1. Niemand überholt.</li><li>Jeder wirft alle anderen in der gewählten Richtung. Der letzte Partner einer Runde ist der vorherige Nachbar – beim ersten Nachfolger also der ursprüngliche Startpartner.</li><li>Nach der eigenen Runde kehrt Nage an seinen Startplatz zurück und wartet, bis alle anderen ihn in dieser Runde geworfen haben. Dann beginnt der nächste Zyklus.</li></ol><p class="hint">Nage wandert innen zum jeweiligen Partner; Uke bleibt an seinem festen Kreisplatz. Ein laufender Werfer wird niemals zwischendurch selbst geworfen. Erst nach allen eigenen Würfen kehrt er an seinen Platz zurück. Dort werfen ihn die Nachfolger in ihrer festen Reihenfolge: beim Startpartner zuerst der direkte Nachfolger. Mehrere unabhängige Zweierpaare können parallel üben; ein belegter Partner führt zu einer Wartepause, niemals zum Überholen. „8/14“ an einer Nage-Figur bedeutet: 8 der 14 Würfe dieser Runde sind ausgeführt. Die gestrichelten Plätze sind nur Startplatzmarkierungen.</p></section>
+  </main>
+  <footer>Keiko <span lang="ja">稽古</span> · Ein Trainingsmodell, keine Anleitung für die Ausführung von Techniken.</footer>
+</body>
+</html>
