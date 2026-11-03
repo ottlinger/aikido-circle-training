@@ -49,13 +49,13 @@ body:not(.running) .connection { animation-play-state: paused; }
 .person { transition: transform var(--move-duration, 450ms) ease-in-out; }
 .person circle { stroke-width: 2; fill: #243e3c; stroke: #748b87; transition: fill .25s, stroke .25s; }
 .person text { fill: var(--text); text-anchor: middle; font-weight: 650; font-size: 16px; dominant-baseline: central; pointer-events: none; }
-.person.tori circle { fill: var(--pair-color); stroke: var(--pair-color); stroke-width: 3; }
-.person.tori text { fill: #102626; }
-.person.uke circle { fill: #172b2c; stroke: var(--pair-color); stroke-width: 4; }
-.person.uke text { fill: var(--pair-color); }
-.person .role-badge, .person.tori .role-badge, .person.uke .role-badge { fill: var(--pair-color); font-size: 11px; font-weight: 800; paint-order: stroke; stroke: #172b2c; stroke-width: 4; }
+.person.moving.paired circle { fill: var(--pair-color); stroke: var(--pair-color); stroke-width: 3; }
+.person.moving.paired text { fill: #102626; }
+.person.paired:not(.moving) circle { fill: #172b2c; stroke: var(--pair-color); stroke-width: 4; }
+.person.paired:not(.moving) text { fill: var(--pair-color); }
+.person .role-badge, .person.moving.paired .role-badge, .person.paired:not(.moving) .role-badge { fill: var(--pair-color, var(--green)); font-size: 11px; font-weight: 800; paint-order: stroke; stroke: #172b2c; stroke-width: 4; }
 .person .throw-counter { fill: var(--green); font-size: 9px; }
-.person.tori .throw-counter { fill: #102626; }
+.person.moving.paired .throw-counter { fill: #102626; }
 .person.waiting circle, .person.returning circle { fill: #233747; stroke: var(--blue); }
 .person.ready circle { stroke: var(--green); }
 .legend { display: flex; flex-wrap: wrap; gap: 10px 18px; justify-content: center; font-size: .72rem; color: var(--muted); }

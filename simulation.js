@@ -3,11 +3,13 @@
   'use strict';
 
   class CircleTraining {
-    constructor({ count = 8, repetitions = 2, direction = 1, starter = 0 } = {}) {
+    constructor({ count = 8, repetitions = 2, direction = 1, starter = 0, mode = 'nage' } = {}) {
       if (!Number.isInteger(count) || count < 3 || count > 20) throw new RangeError('Teilnehmerzahl: 3–20');
       if (![2, 4].includes(repetitions)) throw new RangeError('Wiederholungen: 2 oder 4');
       if (![1, -1].includes(direction)) throw new RangeError('Ungültige Richtung');
       if (!Number.isInteger(starter) || starter < 0 || starter >= count) throw new RangeError('Ungültiger Startpartner');
+      if (!['nage', 'uke'].includes(mode)) throw new RangeError('Ungültiger Trainingsmodus');
+      this.mode = mode;
       this.count = count;
       this.repetitions = repetitions;
       this.direction = direction;
@@ -33,13 +35,19 @@
     }
 
     roundProgress(person) {
-      const currentPair = this.pairs.find((pair) => pair.tori === person.id);
+      const currentPair = this.pairs.find((pair) => pair.mover === person.id);
       const done = person.partnersDone * this.repetitions + (currentPair ? currentPair.throws : 0);
       const total = (this.count - 1) * this.repetitions;
       return { done, total, remaining: total - done };
     }
 
-    incomingThrower(person) {
+    pairRoles(pair) {
+      return this.mode === 'nage'
+        ? { nage: pair.mover, uke: pair.partner }
+        : { nage: pair.partner, uke: pair.mover };
+    }
+
+    incomingMover(person) {
       const order = this.order.filter((id) => id !== person.id);
       const receivedPairs = person.received.reduce((sum, amount) => sum + amount, 0);
       return order[receivedPairs % order.length];
@@ -51,14 +59,14 @@
       for (const id of this.order) {
         const person = this.people[id];
         if (person.phase !== 'ready') continue;
-        const uke = this.target(person);
-        const receiver = this.people[uke];
-        // A moving thrower never receives. Followers cannot overtake the wave.
-        if (receiver.phase === 'ready' || this.incomingThrower(receiver) !== id) continue;
-        if (occupied.has(id) || occupied.has(uke)) continue;
+        const partner = this.target(person);
+        const receiver = this.people[partner];
+        // A traveler never becomes a stationary partner mid-tour. No overtaking.
+        if (receiver.phase === 'ready' || this.incomingMover(receiver) !== id) continue;
+        if (occupied.has(id) || occupied.has(partner)) continue;
         occupied.add(id);
-        occupied.add(uke);
-        this.pairs.push({ tori: id, uke, throws: 0 });
+        occupied.add(partner);
+        this.pairs.push({ mover: id, partner, throws: 0 });
       }
     }
 
@@ -68,9 +76,9 @@
         const predecessor = (person.id - this.direction + this.count) % this.count;
         const required = person.completedCycles + (person.id === this.starter ? 0 : 1);
         const predecessorHasPassed = person.received[predecessor] >= required;
-        const allHaveThrown = person.received.every((amount, id) => id === person.id || amount >= person.completedCycles);
-        // Only the direct predecessor starts a follower, not any earlier thrower.
-        if (predecessorHasPassed && allHaveThrown) {
+        const allHavePassed = person.received.every((amount, id) => id === person.id || amount >= person.completedCycles);
+        // Only the direct predecessor starts a follower, not any earlier traveler.
+        if (predecessorHasPassed && allHavePassed) {
           person.phase = 'ready';
           person.partnersDone = 0;
         }
@@ -91,15 +99,15 @@
       if (this.pairs.length && this.pairs[0].throws < this.repetitions) return;
 
       for (const pair of this.pairs) {
-        const tori = this.people[pair.tori];
-        const uke = this.people[pair.uke];
-        uke.received[tori.id]++;
-        tori.partnersDone++;
+        const mover = this.people[pair.mover];
+        const partner = this.people[pair.partner];
+        partner.received[mover.id]++;
+        mover.partnersDone++;
         this.completedPairs++;
-        this.events.push({ ...pair, cycle: tori.completedCycles + 1 });
-        if (tori.partnersDone === this.count - 1) {
-          tori.completedCycles++;
-          tori.phase = 'returning';
+        this.events.push({ ...pair, cycle: mover.completedCycles + 1 });
+        if (mover.partnersDone === this.count - 1) {
+          mover.completedCycles++;
+          mover.phase = 'returning';
         }
       }
 

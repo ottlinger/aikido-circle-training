@@ -1,4 +1,4 @@
-/* Pure layout: a participant exists once; Uke always stays at their home. */
+/* Pure layout: one figure per person; the stationary partner stays at home. */
 (function (root) {
   'use strict';
   function circleLayout(simulation) {
@@ -11,13 +11,14 @@
     const people = simulation.people.map((person) => ({
       ...point(person.phase === 'ready' ? (person.id + simulation.direction * person.partnersDone + simulation.count) % simulation.count : person.id, person.phase === 'ready' ? 185 : 247),
       role: person.phase,
+      moving: person.phase === 'ready',
       color: null,
     }));
     const pairs = simulation.pairs.map((pair) => {
-      // Stable per thrower, with a unique hue for every participant in the group.
-      const color = `hsl(${(pair.tori * 360 / simulation.count + 25) % 360} 75% 70%)`;
-      people[pair.tori] = { ...point(pair.uke, 185), role: 'tori', color };
-      people[pair.uke] = { ...homes[pair.uke], role: 'uke', color };
+      // Stable per traveler, with a unique hue for every participant in the group.
+      const color = `hsl(${(pair.mover * 360 / simulation.count + 25) % 360} 75% 70%)`;
+      people[pair.mover] = { ...point(pair.partner, 185), role: simulation.mode, moving: true, color };
+      people[pair.partner] = { ...homes[pair.partner], role: simulation.mode === 'nage' ? 'uke' : 'nage', moving: false, color };
       return { ...pair, color };
     });
     return { homes, people, pairs };
