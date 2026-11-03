@@ -6,6 +6,21 @@
   let running = false;
   let timer = null;
   let nodes = [];
+  let translator = KeikoI18n.createTranslator();
+  const t = (key, parameters) => translator.t(key, parameters);
+
+  function applyTranslations() {
+    document.documentElement.lang = translator.language;
+    $('language').value = translator.language;
+    document.title = t('pageTitle');
+    for (const element of document.querySelectorAll('[data-i18n]')) {
+      element.textContent = t(element.dataset.i18n);
+    }
+    for (const element of document.querySelectorAll('[data-i18n-aria-label]')) {
+      element.setAttribute('aria-label', t(element.dataset.i18nAriaLabel));
+    }
+    $('speed-value').textContent = `${translator.number(Number($('speed').value))}×`;
+  }
 
   function randomCount() {
     // Uniform random integer, including both ends; no server or personal data.
@@ -56,39 +71,42 @@
       $('participants').append(group);
       nodes.push({ group, title, badge, counter, number });
     }
-    $('center-count').textContent = `${simulation.count} Teilnehmer · ${simulation.repetitions} Würfe`;
-    $('center-direction').textContent = simulation.direction === 1 ? '↻ Im Uhrzeigersinn' : '↺ Gegen den Uhrzeigersinn';
+  }
+
+  function updateCircleText() {
+    $('center-count').textContent = t('centerCount', { count: simulation.count, repetitions: simulation.repetitions });
+    $('center-direction').textContent = t(simulation.direction === 1 ? 'clockwise' : 'counterclockwise');
     $('direction-guide').setAttribute('d', simulation.direction === 1 ? 'M 320 73 A 247 247 0 0 1 567 320' : 'M 320 73 A 247 247 0 0 0 73 320');
-    $('legend-nage').textContent = simulation.mode === 'nage' ? 'Nage · innen' : 'Nage · am Kreisplatz';
-    $('legend-uke').textContent = simulation.mode === 'nage' ? 'Uke · am Kreisplatz' : 'Uke · innen';
-    $('svg-description').textContent = simulation.mode === 'nage'
-      ? 'Nage wandert innen und wirft Uke am festen Kreisplatz. N kennzeichnet Nage, U kennzeichnet Uke.'
-      : 'Uke wandert innen, greift Nage am festen Kreisplatz an und wird von ihm geworfen. U kennzeichnet Uke, N kennzeichnet Nage.';
-    $('svg-description').textContent += ' Jedes Zweierpaar hat eine gemeinsame Farbe. Der Zähler zeigt ausgeführte und gesamte Wiederholungen. Nach der Runde kehrt der Teilnehmer zum Startplatz zurück.';
+    $('legend-nage').textContent = t(simulation.mode === 'nage' ? 'legendNageInner' : 'legendNageHome');
+    $('legend-uke').textContent = t(simulation.mode === 'nage' ? 'legendUkeHome' : 'legendUkeInner');
+    $('svg-description').textContent = `${t(simulation.mode === 'nage' ? 'svgDescriptionNage' : 'svgDescriptionUke')} ${t('svgDescriptionShared')}`;
   }
 
   function render() {
-    $('status').textContent = running ? 'In Bewegung' : simulation.totalThrows ? 'Pausiert' : 'Bereit';
-    $('play').textContent = running ? 'Ⅱ Pausieren' : simulation.totalThrows ? '▶ Fortsetzen' : '▶ Starten';
+    updateCircleText();
+    $('status').textContent = t(running ? 'statusRunning' : simulation.totalThrows ? 'statusPaused' : 'statusReady');
+    $('play').textContent = t(running ? 'playPause' : simulation.totalThrows ? 'playResume' : 'playStart');
     $('step').disabled = running;
-    $('throws-stat').textContent = simulation.totalThrows;
-    $('pairs-stat').textContent = simulation.completedPairs;
-    $('cycles-stat').textContent = Math.min(...simulation.people.map((person) => person.completedCycles));
+    $('throws-stat').textContent = translator.number(simulation.totalThrows);
+    $('pairs-stat').textContent = translator.number(simulation.completedPairs);
+    $('cycles-stat').textContent = translator.number(Math.min(...simulation.people.map((person) => person.completedCycles)));
     const layout = circleLayout(simulation);
     const attacking = simulation.mode === 'uke';
-    const unit = attacking ? 'Angriffe' : 'Würfe';
-    const passedAction = attacking ? 'haben angegriffen' : 'haben geworfen';
-    const nextRole = attacking ? 'Angreifer' : 'Werfer';
+    const unit = t(attacking ? 'unitAttacks' : 'unitThrows');
+    const passedAction = t(attacking ? 'passedAttack' : 'passedThrow');
+    const nextRole = t(attacking ? 'nextAttacker' : 'nextThrower');
     const starter = simulation.people[simulation.starter];
     const starterProgress = simulation.roundProgress(starter);
-    $('starter-progress').textContent = `Startpartner ${starter.id + 1} (${attacking ? 'Uke' : 'Nage'}): ${starterProgress.done} / ${starterProgress.total} ${unit} · noch ${starterProgress.remaining}`;
+    $('starter-progress').textContent = t('starterProgress', {
+      id: starter.id + 1, role: attacking ? 'Uke' : 'Nage', unit, ...starterProgress,
+    });
     $('starter-state').textContent = starter.phase === 'ready'
-      ? `Eigene Runde ${starter.completedCycles + 1} läuft · nächster Partner: ${simulation.target(starter) + 1}.`
-      : `Eigene Runde beendet · wieder am Startplatz · nächster ${nextRole}: Partner ${simulation.incomingMover(starter) + 1}.`;
+      ? t('starterMoving', { cycle: starter.completedCycles + 1, partner: simulation.target(starter) + 1 })
+      : t('starterWaiting', { role: nextRole, partner: simulation.incomingMover(starter) + 1 });
     document.documentElement.style.setProperty('--move-duration', `${Math.min(450, 600 / Number($('speed').value))}ms`);
     $('connections').replaceChildren();
     $('current-pairs').replaceChildren();
-    if (!layout.pairs.length) $('current-pairs').textContent = 'Rückkehr an die Startplätze – danach geht es weiter.';
+    if (!layout.pairs.length) $('current-pairs').textContent = t('pairsReturning');
     for (const pair of layout.pairs) {
       const from = layout.people[pair.mover];
       const to = layout.people[pair.partner];
@@ -116,27 +134,25 @@
       entry.style.setProperty('--pair-color', pair.color);
       const fromLabel = document.createElement('span');
       fromLabel.className = 'from';
-      fromLabel.textContent = `${attacking ? 'Uke' : 'Nage'} ${pair.mover + 1}`;
+      fromLabel.textContent = t('pairRole', { role: attacking ? 'Uke' : 'Nage', id: pair.mover + 1 });
       const toLabel = document.createElement('span');
       toLabel.className = 'to';
-      toLabel.textContent = `${attacking ? 'Nage' : 'Uke'} ${pair.partner + 1}`;
+      toLabel.textContent = t('pairRole', { role: attacking ? 'Nage' : 'Uke', id: pair.partner + 1 });
       const detail = document.createElement('small');
-      detail.textContent = attacking
-        ? `Angriff + Wurf: ${pair.throws} / ${simulation.repetitions}`
-        : `Dieser Partner: ${pair.throws} / ${simulation.repetitions} Würfe`;
+      detail.textContent = t(attacking ? 'pairAttacks' : 'pairThrows', { done: pair.throws, total: simulation.repetitions });
       const round = document.createElement('strong');
       round.className = 'round-counter';
       const counts = simulation.roundProgress(simulation.people[pair.mover]);
-      round.textContent = `Runde: ${counts.done}/${counts.total} · noch ${counts.remaining} ${unit}`;
-      entry.append(fromLabel, attacking ? ' greift an → ' : ' wirft → ', toLabel, detail, round);
+      round.textContent = t('pairRound', { ...counts, unit });
+      entry.append(fromLabel, t(attacking ? 'pairActionAttack' : 'pairActionThrow'), toLabel, detail, round);
       $('current-pairs').append(entry);
     }
     $('progress-list').replaceChildren();
     const labels = {
-      nage: attacking ? 'wirft am Kreisplatz' : 'wirft im Kreisinneren',
-      uke: attacking ? 'greift innen an und wird geworfen' : 'wird am Kreisplatz geworfen',
-      ready: 'wartet innen auf nächsten Partner', idle: 'wartet auf den Einstieg',
-      returning: 'kehrt zum Startplatz zurück', waiting: 'wartet am Startplatz',
+      nage: t(attacking ? 'roleNageHome' : 'roleNageInner'),
+      uke: t(attacking ? 'roleUkeInner' : 'roleUkeHome'),
+      ready: t('roleReady'), idle: t('roleIdle'),
+      returning: t('roleReturning'), waiting: t('roleWaiting'),
     };
     for (const person of simulation.people) {
       const position = layout.people[person.id];
@@ -150,7 +166,9 @@
       nodes[person.id].badge.textContent = badgeRole === 'nage' ? 'N' : badgeRole === 'uke' ? 'U' : '';
       nodes[person.id].counter.textContent = person.phase === 'ready' ? `${counts.done}/${counts.total}` : '';
       nodes[person.id].number.setAttribute('y', person.phase === 'ready' ? -6 : 0);
-      nodes[person.id].title.textContent = `Partner ${person.id + 1}: ${labels[currentRole]}. Eigene Runde: ${counts.done} von ${counts.total} ${unit}, noch ${counts.remaining}. ${person.completedCycles} Runden beendet.`;
+      nodes[person.id].title.textContent = t('personTitle', {
+        id: person.id + 1, state: labels[currentRole], ...counts, unit, cycles: person.completedCycles,
+      });
       const row = document.createElement('div');
       row.className = 'progress-row';
       const number = document.createElement('span');
@@ -160,17 +178,17 @@
       detail.className = 'progress-detail';
       const received = person.received.filter((amount, id) => id !== person.id && amount >= Math.max(1, person.completedCycles)).length;
       detail.textContent = person.phase === 'waiting' || person.phase === 'returning'
-        ? `${labels[currentRole]} · ${received}/${simulation.count - 1} ${passedAction} · als Nächstes: ${simulation.incomingMover(person) + 1}`
-        : person.phase === 'idle' ? `Wartet, bis der direkte Vorgänger mit ihm geübt hat. ${labels[currentRole]}.`
-        : `Runde ${person.completedCycles + 1} · ${labels[currentRole]}`;
+        ? t('personWaiting', { state: labels[currentRole], received, count: simulation.count - 1, action: passedAction, partner: simulation.incomingMover(person) + 1 })
+        : person.phase === 'idle' ? t('personIdle', { state: labels[currentRole] })
+        : t('personRound', { cycle: person.completedCycles + 1, state: labels[currentRole] });
       const counter = document.createElement('strong');
       counter.className = 'round-counter';
-      counter.textContent = `${counts.done}/${counts.total} ${unit} · noch ${counts.remaining}`;
+      counter.textContent = t('personCounter', { ...counts, unit });
       detail.append(counter);
       const progress = document.createElement('progress');
       progress.max = counts.total;
       progress.value = counts.done;
-      progress.setAttribute('aria-label', `Partner ${person.id + 1}: ausgeführte ${unit} der eigenen Runde`);
+      progress.setAttribute('aria-label', t('progressAria', { id: person.id + 1, unit }));
       detail.append(progress);
       row.append(number, detail);
       $('progress-list').append(row);
@@ -224,10 +242,16 @@
   });
   $('count').addEventListener('input', () => { updateStarters(); reset(); });
   for (const id of ['direction', 'repetitions', 'starter', 'mode']) $(id).addEventListener('change', reset);
-  $('speed').addEventListener('input', () => { $('speed-value').textContent = `${$('speed').value}×`; queueTick(); });
+  $('speed').addEventListener('input', () => { $('speed-value').textContent = `${translator.number(Number($('speed').value))}×`; queueTick(); });
+  $('language').addEventListener('change', () => {
+    translator = KeikoI18n.createTranslator($('language').value);
+    applyTranslations();
+    render();
+  });
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && running) { pause(); render(); }
   });
+  applyTranslations();
   $('count').value = randomCount();
   updateStarters();
   reset();

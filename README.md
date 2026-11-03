@@ -1,6 +1,8 @@
 # Aikidō Circle Training · Keiko 稽古
 
-Eine lokale JavaScript-Anwendung zur Visualisierung des Aikidō-Trainingskreises. Geübt wird **immer zwischen zwei Partnern** (Nage und Uke); der Kreis organisiert das Training aller mit allen. Keine personenbezogenen Daten, kein Backend, keine externen Bibliotheken oder Netzwerkanfragen.
+**Deutsch** | [English](README.en.md)
+
+Eine lokale JavaScript-Anwendung zur Visualisierung des Aikidō-Trainingskreises. Geübt wird **immer zwischen zwei Partnern** (Nage und Uke); der Kreis organisiert das Training aller mit allen. Keine personenbezogenen Daten, kein Backend, keine externen Bibliotheken oder Netzwerkanfragen. Im Footer führt ein GitHub-Link mit Octocat-Logo zum [Quellcode](https://github.com/ottlinger/aikido-circle-training).
 
 ## Starten
 
@@ -16,10 +18,11 @@ Dann <http://localhost:8888> öffnen. Mit der vorhandenen Docker-Konfiguration g
 
 ## Bedienung
 
+- **Sprache:** Oben rechts zwischen **Deutsch** und **English** wählen. **Deutsch ist bei jedem Laden der Standard**, unabhängig von der Browsersprache. Der Wechsel übersetzt die gesamte Oberfläche einschließlich Kreis, Status, Zählern, Erklärungen und Screenreader-Texten, ohne das Training zu pausieren oder zurückzusetzen. Die Sprachwahl wird nicht gespeichert.
 - Beim Laden wird eine zufällige Gruppengröße von **3 bis 20** gewählt. Über den Regler oder „Zufällige Gruppe“ lässt sie sich ändern.
 - Richtung, **2 oder 4 Wiederholungen pro Partner**, Startpartner und **Rolle im Kreisinneren** wählen: **Nage wandert und wirft** (Standard) oder **Uke wandert und greift an**.
 - Starten, pausieren, einzelne Würfe schrittweise ausführen oder zurücksetzen.
-- Das Tempo lässt sich auch während des Trainings ändern. Andere Einstellungen setzen das Training zurück.
+- Sprache und Tempo lassen sich auch während des Trainings ändern. Andere Einstellungen setzen das Training zurück.
 - Jedes aktive Zweierpaar hat eine eigene gemeinsame Farbe. Die innere Figur ist ausgefüllt, der feste Kreispartner hat einen farbigen Rand. **N** kennzeichnet Nage, **U** Uke; die Position der Rollen hängt vom Modus ab. Blau bedeutet Rückkehr/Warten; gestrichelte Kreise markieren freie Startplätze.
 - An jeder inneren Figur steht **ausgeführt / insgesamt**, z. B. `8/14`. Listen und Startpartnerübersicht zeigen zusätzlich die **noch verbleibenden Würfe** (Nage-Modus) bzw. **Angriffe** (Uke-Modus). Pfeile führen vom inneren Teilnehmer zum festen Kreispartner: als Wurf- bzw. Angriffsrichtung.
 - Eine eigene Runde umfasst `(Teilnehmerzahl − 1) × Wiederholungen`. Im Uke-Modus ist eine Wiederholung ein Angriff mit anschließendem Wurf durch den festen Nage; der Angriff zählt nicht zusätzlich als zweiter Schritt. Die globale Wurfzahl zählt in beiden Modi die tatsächlich simulierten Würfe. Übungen mit später vorbeikommenden Nachfolgern verändern den bereits abgeschlossenen eigenen Rundenzähler nicht.
@@ -40,7 +43,7 @@ Beispiel: 5 Teilnehmer, Startpartner 1, Uhrzeigersinn, 2 Würfe pro Partner. Par
 
 Im Uke-Modus besucht Partner 1 ebenfalls **2 → 3 → 4 → 5**, greift jeden zweimal an und empfängt insgesamt **8 Würfe**. Partner 2 folgt als Uke mit **3 → 4 → 5 → 1**. Nachdem Partner 1 zurückgekehrt ist, greift ihn also zuerst Partner 2 an; Partner 1 wirft ihn am festen Kreisplatz.
 
-Für die nächste Runde müssen alle anderen einen für die vorherige Runde besucht haben. Der Startpartner eröffnet die neue Welle; die Nachfolger steigen erneut ein, wenn ihr direkter Vorgänger sie geworfen hat. So bleibt auch über mehrere Zyklen hinweg der Abstand erhalten. Eingehende abgeschlossene Partnerübungen werden pro vorbeikommendem Teilnehmer gezählt. Ein Simulationsschritt ist ein Wurf **je aktuellem Paar**; nach der letzten Wiederholung werden die nächsten konfliktfreien Paare gebildet. Die Rückkehr wird mindestens einen Zustand lang gezeigt. Falls gerade alle zurückkehren, ist der nächste Schritt ein Partnerwechsel ohne Wurf.
+Für die nächste Runde müssen alle anderen einen für die vorherige Runde besucht haben. Der Startpartner eröffnet die neue Welle; die Nachfolger steigen erneut ein, wenn ihr direkter Vorgänger mit ihnen geübt hat. So bleibt auch über mehrere Zyklen hinweg der Abstand erhalten. Eingehende abgeschlossene Partnerübungen werden pro vorbeikommendem Teilnehmer gezählt. Ein Simulationsschritt ist ein Wurf **je aktuellem Paar**; nach der letzten Wiederholung werden die nächsten konfliktfreien Paare gebildet. Die Rückkehr wird mindestens einen Zustand lang gezeigt. Falls gerade alle zurückkehren, ist der nächste Schritt ein Partnerwechsel ohne Wurf.
 
 ## Dateien und Tests
 
@@ -48,8 +51,9 @@ Für die nächste Runde müssen alle anderen einen für die vorherige Runde besu
 - `styles.css`: responsive Darstellung, Farben und Animationen; berücksichtigt reduzierte Bewegung
 - `simulation.js`: rollenunabhängige Partnerwechsel (`mover`/`partner`) und Nage/Uke-Zuordnung je Modus, auch mit Node.js testbar
 - `visualization.js`: Layout für feste Kreisplätze, bewegte Nage oder Uke und Paarfarben
-- `app.js`: Browsersteuerung und SVG-Animation
-- `tests/simulation.test.cjs`, `tests/visualization.test.cjs`: Tests ohne zusätzliche Abhängigkeiten
+- `i18n.js`: lokale deutsche und englische Übersetzungen, Platzhalter und Zahlenformatierung
+- `app.js`: Browsersteuerung, Sprachwechsel und SVG-Animation
+- `tests/simulation.test.cjs`, `tests/visualization.test.cjs`, `tests/i18n.test.cjs`: Tests ohne zusätzliche Abhängigkeiten
 
 Mit Node.js (18 oder neuer):
 
@@ -57,4 +61,4 @@ Mit Node.js (18 oder neuer):
 node --test tests/*.test.cjs
 ```
 
-Die Tests prüfen **beide Modi**, alle Gruppengrößen, beide Richtungen und beide Wiederholungszahlen über mehrere Runden: keine Doppelbelegung, kein Überholen, keine Rollenwechsel während einer inneren Runde, korrekte Reihenfolge, Einstieg nur durch den direkten Vorgänger, Wartebedingung, sichtbare Rückkehr und kein Stillstand. Der bestätigte Ablauf „Partner 1 wirft alle, kommt zurück und wird zuerst von Partner 2 geworfen“ und die Variante mit angreifendem Uke sind ausdrücklich getestet. Zählertests prüfen jede ausgeführte/verbleibende Wiederholung. Layouttests prüfen die feste und die innere Position, korrekte Nage/Uke-Zuordnung, eindeutige Paarfarben und genau eine Figur pro Person.
+Die Tests prüfen **beide Modi**, alle Gruppengrößen, beide Richtungen und beide Wiederholungszahlen über mehrere Runden: keine Doppelbelegung, kein Überholen, keine Rollenwechsel während einer inneren Runde, korrekte Reihenfolge, Einstieg nur durch den direkten Vorgänger, Wartebedingung, sichtbare Rückkehr und kein Stillstand. Der bestätigte Ablauf „Partner 1 wirft alle, kommt zurück und wird zuerst von Partner 2 geworfen“ und die Variante mit angreifendem Uke sind ausdrücklich getestet. Zählertests prüfen jede ausgeführte/verbleibende Wiederholung. Layouttests prüfen die feste und die innere Position, korrekte Nage/Uke-Zuordnung, eindeutige Paarfarben und genau eine Figur pro Person. Übersetzungstests prüfen Deutsch als Standard, vollständige Sprachkataloge, identische Platzhalter, statische und dynamische Texte, Screenreader-Beschriftungen und sprachabhängige Zahlenformate.

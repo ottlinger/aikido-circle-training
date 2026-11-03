@@ -8,39 +8,44 @@
   <link rel="stylesheet" href="styles.css">
   <script src="simulation.js" defer></script>
   <script src="visualization.js" defer></script>
+  <script src="i18n.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
   <header class="page-header">
     <div class="brand-mark" aria-hidden="true" lang="ja">合気</div>
-    <div><p class="eyebrow">AIKIDŌ · GEMEINSAM IN BEWEGUNG</p><h1>Der Trainingskreis</h1></div>
-    <span class="local-badge">Lokal. Ohne persönliche Daten.</span>
+    <div><p class="eyebrow" data-i18n="brandTagline">AIKIDŌ · GEMEINSAM IN BEWEGUNG</p><h1 data-i18n="pageHeading">Der Trainingskreis</h1></div>
+    <span class="local-badge" data-i18n="localBadge">Lokal. Ohne persönliche Daten.</span>
+    <div class="language-picker">
+      <label for="language" data-i18n="languageLabel">Sprache</label>
+      <select id="language"><option value="de" lang="de" selected>Deutsch</option><option value="en" lang="en">English</option></select>
+    </div>
   </header>
 
   <main>
     <section class="controls card" aria-labelledby="settings-title">
-      <div class="section-heading"><span class="eyebrow">DEIN KEIKO</span><h2 id="settings-title">Training gestalten</h2></div>
+      <div class="section-heading"><span class="eyebrow" data-i18n="settingsEyebrow">DEIN KEIKO</span><h2 id="settings-title" data-i18n="settingsTitle">Training gestalten</h2></div>
       <div class="field">
-        <label for="count">Teilnehmer <output id="count-value" for="count"></output></label>
+        <label for="count"><span data-i18n="participants">Teilnehmer</span> <output id="count-value" for="count"></output></label>
         <input id="count" type="range" min="3" max="20" value="8">
-        <button id="randomize" class="quiet" type="button">↻ Zufällige Gruppe</button>
+        <button id="randomize" class="quiet" type="button" data-i18n="randomGroup">↻ Zufällige Gruppe</button>
       </div>
-      <div class="field"><label for="direction">Richtung</label><select id="direction"><option value="1">↻ Im Uhrzeigersinn</option><option value="-1">↺ Gegen den Uhrzeigersinn</option></select></div>
-      <div class="field"><label for="mode">Rolle im Kreisinneren</label><select id="mode"><option value="nage">Nage – wirft</option><option value="uke">Uke – greift an</option></select></div>
-      <div class="field"><label for="repetitions">Würfe pro Partner</label><select id="repetitions"><option value="2">2 Würfe</option><option value="4">4 Würfe</option></select></div>
-      <div class="field"><label for="starter">Startpartner</label><select id="starter"></select></div>
-      <div class="field"><label for="speed">Tempo <output id="speed-value" for="speed">1×</output></label><input id="speed" type="range" min="0.5" max="3" step="0.5" value="1"></div>
-      <p class="hint">Änderungen an Gruppe, Richtung, Rolle oder Würfen beginnen ein neues Training.</p>
-      <div class="buttons"><button id="play" class="primary" type="button">▶ Starten</button><button id="step" type="button">Ein Schritt</button><button id="reset" class="quiet" type="button">Zurücksetzen</button></div>
+      <div class="field"><label for="direction" data-i18n="directionLabel">Richtung</label><select id="direction"><option value="1" data-i18n="clockwise">↻ Im Uhrzeigersinn</option><option value="-1" data-i18n="counterclockwise">↺ Gegen den Uhrzeigersinn</option></select></div>
+      <div class="field"><label for="mode" data-i18n="modeLabel">Rolle im Kreisinneren</label><select id="mode"><option value="nage" data-i18n="modeNage">Nage – wirft</option><option value="uke" data-i18n="modeUke">Uke – greift an</option></select></div>
+      <div class="field"><label for="repetitions" data-i18n="repetitionsLabel">Würfe pro Partner</label><select id="repetitions"><option value="2" data-i18n="repetitionsTwo">2 Würfe</option><option value="4" data-i18n="repetitionsFour">4 Würfe</option></select></div>
+      <div class="field"><label for="starter" data-i18n="starterLabel">Startpartner</label><select id="starter"></select></div>
+      <div class="field"><label for="speed"><span data-i18n="speedLabel">Tempo</span> <output id="speed-value" for="speed">1×</output></label><input id="speed" type="range" min="0.5" max="3" step="0.5" value="1"></div>
+      <p class="hint" data-i18n="settingsHint">Änderungen an Gruppe, Richtung, Rolle oder Würfen beginnen ein neues Training. Sprache und Tempo lassen sich ohne Neustart ändern.</p>
+      <div class="buttons"><button id="play" class="primary" type="button">▶ Starten</button><button id="step" type="button" data-i18n="step">Ein Schritt</button><button id="reset" class="quiet" type="button" data-i18n="reset">Zurücksetzen</button></div>
     </section>
 
     <section class="visual card" aria-labelledby="circle-title">
-      <div class="visual-heading"><div><p class="eyebrow">DIE BEWEGUNG IM KREIS</p><h2 id="circle-title">Ein Partner. Eine neue Welle.</h2></div><span id="status" class="status" role="status">Bereit</span></div>
+      <div class="visual-heading"><div><p class="eyebrow" data-i18n="visualEyebrow">DIE BEWEGUNG IM KREIS</p><h2 id="circle-title" data-i18n="circleTitle">Ein Partner. Eine neue Welle.</h2></div><span id="status" class="status" role="status">Bereit</span></div>
       <div class="starter-summary"><strong id="starter-progress"></strong><span id="starter-state"></span></div>
       <div class="circle-wrap">
         <svg id="circle" viewBox="0 0 640 640" role="img" aria-labelledby="svg-title svg-description">
-          <title id="svg-title">Aikidō-Trainingskreis</title>
-          <desc id="svg-description">Nage bewegt sich im Kreisinneren, Uke bleibt am nummerierten Kreisplatz. Jedes aktive Zweierpaar hat eine eigene gemeinsame Farbe. N kennzeichnet Nage, U kennzeichnet Uke. Nach seiner Runde kehrt Nage zum Startplatz zurück. Die aktuellen Paare stehen auch in der Paarliste.</desc>
+          <title id="svg-title" data-i18n="svgTitle">Aikidō-Trainingskreis</title>
+          <desc id="svg-description">Nage wandert innen und wirft Uke am festen Kreisplatz. N kennzeichnet Nage, U kennzeichnet Uke.</desc>
           <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#dca35e"/></marker></defs>
           <circle cx="320" cy="320" r="247" class="mat-outer"/>
           <circle cx="320" cy="320" r="207" class="mat-inner"/>
@@ -51,13 +56,26 @@
           <g id="home-positions"></g><g id="connections"></g><g id="participants"></g>
         </svg>
       </div>
-      <div class="legend"><span><i class="dot pair-color"></i>Gleiche Farbe = ein Paar</span><span><b>N</b> <span id="legend-nage">Nage · innen</span></span><span><b>U</b> <span id="legend-uke">Uke · am Kreisplatz</span></span><span><i class="dot waiting"></i>Zurück / wartet</span><span><i class="dot home"></i>Freier Startplatz</span></div>
-      <div class="stats"><div><strong id="throws-stat">0</strong><span>Würfe insgesamt</span></div><div><strong id="pairs-stat">0</strong><span>Partnerübungen beendet</span></div><div><strong id="cycles-stat">0</strong><span>Runden aller Teilnehmer</span></div></div>
+      <div class="legend"><span><i class="dot pair-color"></i><span data-i18n="legendPair">Gleiche Farbe = ein Paar</span></span><span><b>N</b> <span id="legend-nage">Nage · innen</span></span><span><b>U</b> <span id="legend-uke">Uke · am Kreisplatz</span></span><span><i class="dot waiting"></i><span data-i18n="legendWaiting">Zurück / wartet</span></span><span><i class="dot home"></i><span data-i18n="legendHome">Freier Startplatz</span></span></div>
+      <div class="stats"><div><strong id="throws-stat">0</strong><span data-i18n="totalThrows">Würfe insgesamt</span></div><div><strong id="pairs-stat">0</strong><span data-i18n="completedPairs">Partnerübungen beendet</span></div><div><strong id="cycles-stat">0</strong><span data-i18n="cycles">Runden aller Teilnehmer</span></div></div>
     </section>
 
-    <section class="activity card" aria-labelledby="activity-title"><p class="eyebrow">AUF DER MATTE</p><h2 id="activity-title">Aktuelle Paare</h2><div id="current-pairs" class="pair-list"></div><h3>Teilnehmer & Fortschritt</h3><div id="progress-list" class="progress-list"></div></section>
-    <section class="explanation card" aria-labelledby="rules-title"><p class="eyebrow">SO FUNKTIONIERT’S</p><h2 id="rules-title">Eine Welle wird zum Kreis.</h2><p>Geübt wird immer zu zweit: Nage wirft, Uke greift an und wird geworfen. Es gibt zwei Kreisvarianten: <strong>Nage wandert und wirft</strong> (bisheriger Ablauf), oder <strong>Uke wandert und greift an</strong>. In der zweiten Variante greift der Startpartner jeden Partner 2 oder 4-mal an, wird jeweils von ihm geworfen und geht dann weiter. Der jeweilige Nage bleibt am Kreisplatz.</p><ol><li>Der Startpartner übt mit dem nächsten Nachbarn – jeweils 2 oder 4 Würfe.</li><li>Sobald er weitergeht, folgt sein erster Partner mit Abstand und derselben inneren Rolle. Partner 3 folgt erst nach der Übung mit Partner 2 – nicht schon nach der mit Partner 1. Niemand überholt.</li><li>Jeder besucht alle anderen in der gewählten Richtung: als Nage zum Werfen oder als Uke zum Angreifen. Der letzte Partner einer Runde ist der vorherige Nachbar – beim ersten Nachfolger also der ursprüngliche Startpartner.</li><li>Nach der eigenen Runde kehrt der Teilnehmer an seinen Startplatz zurück. Dort wird er von den Nachfolgern geworfen (Nage wandert) oder angegriffen und wirft sie (Uke wandert). Erst nach allen anderen und dem nächsten Startsignal seines Vorgängers folgt der nächste Zyklus; der Startpartner eröffnet die neue Welle.</li></ol><p class="hint">Die Reihenfolge und Wartebedingungen sind in beiden Varianten gleich. Der Teilnehmer im Inneren bleibt für seine ganze Runde in seiner Rolle; er wird nicht zwischendurch zum festen Kreispartner. Mehrere unabhängige Zweierpaare können parallel üben, aber niemand überholt. Gleiche Farben kennzeichnen ein Paar; ausgefüllt = innen, farbiger Rand = fester Kreisplatz. Pfeile führen vom inneren Teilnehmer zum Kreispartner: als Wurf- oder Angriffsrichtung, je nach Modus. „8/14“ bedeutet: 8 von 14 Würfen bzw. Angriffen der eigenen Runde sind ausgeführt. Ein Angriff mit anschließendem Wurf zählt als eine Wiederholung. Die gestrichelten Plätze sind nur Startplatzmarkierungen.</p></section>
+    <section class="activity card" aria-labelledby="activity-title"><p class="eyebrow" data-i18n="activityEyebrow">AUF DER MATTE</p><h2 id="activity-title" data-i18n="activityTitle">Aktuelle Paare</h2><div id="current-pairs" class="pair-list"></div><h3 data-i18n="progressTitle">Teilnehmer & Fortschritt</h3><div id="progress-list" class="progress-list"></div></section>
+    <section class="explanation card" aria-labelledby="rules-title">
+      <p class="eyebrow" data-i18n="rulesEyebrow">SO FUNKTIONIERT’S</p><h2 id="rules-title" data-i18n="rulesTitle">Eine Welle wird zum Kreis.</h2>
+      <p><span data-i18n="rulesIntroStart">Geübt wird immer zu zweit: Nage wirft, Uke greift an und wird geworfen. Es gibt zwei Kreisvarianten: </span><strong data-i18n="rulesModeNage">Nage wandert und wirft</strong><span data-i18n="rulesIntroMiddle"> (bisheriger Ablauf), oder </span><strong data-i18n="rulesModeUke">Uke wandert und greift an</strong><span data-i18n="rulesIntroEnd">. In der zweiten Variante greift der Startpartner jeden Partner 2 oder 4-mal an, wird jeweils von ihm geworfen und geht dann weiter. Der jeweilige Nage bleibt am Kreisplatz.</span></p>
+      <ol>
+        <li data-i18n="ruleStart">Der Startpartner übt mit dem nächsten Nachbarn – jeweils 2 oder 4 Würfe.</li>
+        <li data-i18n="ruleFollow">Sobald er weitergeht, folgt sein erster Partner mit Abstand und derselben inneren Rolle. Partner 3 folgt erst nach der Übung mit Partner 2 – nicht schon nach der mit Partner 1. Niemand überholt.</li>
+        <li data-i18n="ruleVisit">Jeder besucht alle anderen in der gewählten Richtung: als Nage zum Werfen oder als Uke zum Angreifen. Der letzte Partner einer Runde ist der vorherige Nachbar – beim ersten Nachfolger also der ursprüngliche Startpartner.</li>
+        <li data-i18n="ruleReturn">Nach der eigenen Runde kehrt der Teilnehmer an seinen Startplatz zurück. Dort wird er von den Nachfolgern geworfen (Nage wandert) oder angegriffen und wirft sie (Uke wandert). Erst nach allen anderen und dem nächsten Startsignal seines Vorgängers folgt der nächste Zyklus; der Startpartner eröffnet die neue Welle.</li>
+      </ol>
+      <p class="hint" data-i18n="rulesHint">Die Reihenfolge und Wartebedingungen sind in beiden Varianten gleich. Der Teilnehmer im Inneren bleibt für seine ganze Runde in seiner Rolle; er wird nicht zwischendurch zum festen Kreispartner. Mehrere unabhängige Zweierpaare können parallel üben, aber niemand überholt. Gleiche Farben kennzeichnen ein Paar; ausgefüllt = innen, farbiger Rand = fester Kreisplatz. Pfeile führen vom inneren Teilnehmer zum Kreispartner: als Wurf- oder Angriffsrichtung, je nach Modus. „8/14“ bedeutet: 8 von 14 Würfen bzw. Angriffen der eigenen Runde sind ausgeführt. Ein Angriff mit anschließendem Wurf zählt als eine Wiederholung. Die gestrichelten Plätze sind nur Startplatzmarkierungen.</p>
+    </section>
   </main>
-  <footer>Keiko <span lang="ja">稽古</span> · Ein Trainingsmodell, keine Anleitung für die Ausführung von Techniken.</footer>
+  <footer>Keiko <span lang="ja">稽古</span> · <span data-i18n="footerNote">Ein Trainingsmodell, keine Anleitung für die Ausführung von Techniken.</span>
+    <span aria-hidden="true"> · </span><a class="github-link" href="https://github.com/ottlinger/aikido-circle-training" aria-label="Quellcode auf GitHub" data-i18n-aria-label="githubLinkLabel"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.65 7.65 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg><span>GitHub</span></a>
+    · <span data-i18n="generatedWith">Mit Unterstützung von gpt-6.1-sol erstellt</span>
+  </footer>
 </body>
 </html>
