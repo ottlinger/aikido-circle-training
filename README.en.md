@@ -25,12 +25,13 @@ Then open <http://localhost:8888>. The existing Docker configuration also works:
 - **Language:** Choose **Deutsch** or **English** in the top-right corner. **German is the default on every page load**, regardless of the browser language. Switching translates the entire interface, including the circle, status messages, counters, explanations and screen-reader text, without pausing or resetting the session. The language choice is not stored.
 - A random group of **3–20 participants** is selected on page load. Use the slider or “Random group” to change it.
 - Select a direction, **2 or 4 repetitions per partner**, a starting partner and the **role inside the circle**: **Nage moves and throws** (default) or **Uke moves and attacks**.
-- Start, pause, advance one step at a time or reset.
+- **Rounds per participant:** select **1, 2, 3 (default), 5 or 10 rounds**, or **Unlimited**. Everyone visits everyone else once per round. Training stops automatically once everyone has completed the selected rounds; nobody starts an extra round. “Unlimited” preserves the previous continuous behavior.
+- Start, pause, advance one step at a time or reset. After completion, **“Restart”** starts a new session with the same settings.
 - Language and speed can also be changed while training is running. Other settings reset the session.
 - Each active pair shares one color. The inner participant is filled; the stationary circle partner has a colored outline. **N** identifies Nage and **U** identifies Uke. Their positions depend on the mode. Blue means returning/waiting; dashed circles mark vacant home positions.
 - Each inner figure shows **completed / total**, such as `8/14`. The lists and starting-partner summary also show **remaining throws** in Nage mode or **remaining attacks** in Uke mode. Arrows point from the inner participant to the stationary circle partner, indicating the throw or attack direction.
 - An own round consists of `(participant count − 1) × repetitions`. In Uke mode, one repetition is an attack followed by a throw by the stationary Nage. The attack is not counted as an additional step. The total throw statistic counts actual simulated throws in either mode. Exercises with followers visiting afterwards do not change the completed own-round counter.
-- “Rounds completed by everyone” is the number of inner rounds that every participant has completed. The center displays **Keiko**, the logo **合気 (Aiki)**, and the footer **稽古 (Keiko)**.
+- “Current round for everyone” starts at **1 / 3** (default) or **1 / ∞**. It advances to the next round once everyone has completed the previous one. At the end, it stays at the selected round count, such as **3 / 3**. The center displays **Keiko**, the logo **合気 (Aiki)**, and the footer **稽古 (Keiko)**.
 
 ## Simulation model
 
@@ -68,7 +69,7 @@ GitHub has no separate repository avatar field. To set the preview image, open *
 - `visualization.js`: fixed home positions, moving Nage or Uke and pair colors
 - `i18n.js`: local German/English translations, placeholders and number formatting
 - `app.js`: browser controls, language switching and SVG animation
-- `tests/simulation.test.cjs`, `tests/visualization.test.cjs`, `tests/i18n.test.cjs`: dependency-free tests
+- `tests/simulation.test.cjs`, `tests/visualization.test.cjs`, `tests/i18n.test.cjs`, `tests/app.test.cjs`: dependency-free tests
 
 With Node.js 18 or newer:
 
@@ -78,4 +79,4 @@ node --test tests/*.test.cjs
 
 The GitHub Action `.github/workflows/tests.yml` checks JavaScript syntax and runs every test on **Node.js 18, 22 and 24** for each push and pull request. It can also be started manually. The badge at the top shows the actual test status on `main`, turning green after a successful run.
 
-Tests cover both modes, all group sizes, both directions and both repetition counts across multiple rounds: no double booking, no overtaking, no role changes during an inner round, correct sequence, activation only by the direct predecessor, waiting conditions, visible homecoming and no deadlocks. Counter tests check each completed/remaining repetition. Layout tests verify positions, Nage/Uke assignment, unique pair colors and one figure per participant. Translation tests verify the German default, complete language catalogs, matching placeholders, static and dynamic text, screen-reader labels and locale-specific number formatting.
+Tests cover both modes, all group sizes, both directions and both repetition counts across multiple rounds: no double booking, no overtaking, no role changes during an inner round, correct sequence, activation only by the direct predecessor, waiting conditions, visible homecoming and no deadlocks. Counter tests check each completed/remaining repetition. Finite sessions are tested for every offered round count: exact completion by everyone, no extra rounds and no changes after completion. Controller tests cover the default selection, manual steps, automatic stopping, restarting, translating completed sessions and unlimited operation. Layout tests verify positions, Nage/Uke assignment, unique pair colors and one figure per participant. Translation tests verify the German default, complete language catalogs, matching placeholders, static and dynamic text, screen-reader labels and locale-specific number formatting.

@@ -36,9 +36,10 @@
       <div class="field"><label for="direction" data-i18n="directionLabel">Richtung</label><select id="direction"><option value="1" data-i18n="clockwise">↻ Im Uhrzeigersinn</option><option value="-1" data-i18n="counterclockwise">↺ Gegen den Uhrzeigersinn</option></select></div>
       <div class="field"><label for="mode" data-i18n="modeLabel">Rolle im Kreisinneren</label><select id="mode"><option value="nage" data-i18n="modeNage">Nage – wirft</option><option value="uke" data-i18n="modeUke">Uke – greift an</option></select></div>
       <div class="field"><label for="repetitions" data-i18n="repetitionsLabel">Würfe pro Partner</label><select id="repetitions"><option value="2" data-i18n="repetitionsTwo">2 Würfe</option><option value="4" data-i18n="repetitionsFour">4 Würfe</option></select></div>
+      <div class="field"><label for="rounds" data-i18n="roundsLabel">Runden pro Teilnehmer</label><select id="rounds"><option value="1" data-i18n="roundsOne">1 Runde</option><option value="2" data-i18n="roundsTwo">2 Runden</option><option value="3" selected data-i18n="roundsThree">3 Runden</option><option value="5" data-i18n="roundsFive">5 Runden</option><option value="10" data-i18n="roundsTen">10 Runden</option><option value="Infinity" data-i18n="roundsInfinite">Unendlich</option></select><p class="hint" data-i18n="roundsHint">Eine Runde: Jeder besucht alle anderen. Danach stoppt das Training automatisch – außer bei „Unendlich“.</p></div>
       <div class="field"><label for="starter" data-i18n="starterLabel">Startpartner</label><select id="starter"></select></div>
       <div class="field"><label for="speed"><span data-i18n="speedLabel">Tempo</span> <output id="speed-value" for="speed">1×</output></label><input id="speed" type="range" min="0.5" max="3" step="0.5" value="1"></div>
-      <p class="hint" data-i18n="settingsHint">Änderungen an Gruppe, Richtung, Rolle oder Würfen beginnen ein neues Training. Sprache und Tempo lassen sich ohne Neustart ändern.</p>
+      <p class="hint" data-i18n="settingsHint">Änderungen an Gruppe, Richtung, Rolle, Würfen oder Rundenzahl beginnen ein neues Training. Sprache und Tempo lassen sich ohne Neustart ändern.</p>
       <div class="buttons"><button id="play" class="primary" type="button">▶ Starten</button><button id="step" type="button" data-i18n="step">Ein Schritt</button><button id="reset" class="quiet" type="button" data-i18n="reset">Zurücksetzen</button></div>
     </section>
 
@@ -60,7 +61,7 @@
         </svg>
       </div>
       <div class="legend"><span><i class="dot pair-color"></i><span data-i18n="legendPair">Gleiche Farbe = ein Paar</span></span><span><b>N</b> <span id="legend-nage">Nage · innen</span></span><span><b>U</b> <span id="legend-uke">Uke · am Kreisplatz</span></span><span><i class="dot waiting"></i><span data-i18n="legendWaiting">Zurück / wartet</span></span><span><i class="dot home"></i><span data-i18n="legendHome">Freier Startplatz</span></span></div>
-      <div class="stats"><div><strong id="throws-stat">0</strong><span data-i18n="totalThrows">Würfe insgesamt</span></div><div><strong id="pairs-stat">0</strong><span data-i18n="completedPairs">Partnerübungen beendet</span></div><div><strong id="cycles-stat">0</strong><span data-i18n="cycles">Runden aller Teilnehmer</span></div></div>
+      <div class="stats"><div><strong id="throws-stat">0</strong><span data-i18n="totalThrows">Würfe insgesamt</span></div><div><strong id="pairs-stat">0</strong><span data-i18n="completedPairs">Partnerübungen beendet</span></div><div><strong id="cycles-stat">1 / 3</strong><span data-i18n="cycles">Aktuelle Runde aller Teilnehmer</span></div></div>
     </section>
 
     <section class="activity card" aria-labelledby="activity-title"><p class="eyebrow" data-i18n="activityEyebrow">AUF DER MATTE</p><h2 id="activity-title" data-i18n="activityTitle">Aktuelle Paare</h2><div id="current-pairs" class="pair-list"></div><h3 data-i18n="progressTitle">Teilnehmer & Fortschritt</h3><div id="progress-list" class="progress-list"></div></section>

@@ -3,12 +3,14 @@
   'use strict';
 
   class CircleTraining {
-    constructor({ count = 8, repetitions = 2, direction = 1, starter = 0, mode = 'nage' } = {}) {
+    constructor({ count = 8, repetitions = 2, direction = 1, starter = 0, mode = 'nage', rounds = Infinity } = {}) {
       if (!Number.isInteger(count) || count < 3 || count > 20) throw new RangeError('Teilnehmerzahl: 3–20');
       if (![2, 4].includes(repetitions)) throw new RangeError('Wiederholungen: 2 oder 4');
       if (![1, -1].includes(direction)) throw new RangeError('Ungültige Richtung');
       if (!Number.isInteger(starter) || starter < 0 || starter >= count) throw new RangeError('Ungültiger Startpartner');
       if (!['nage', 'uke'].includes(mode)) throw new RangeError('Ungültiger Trainingsmodus');
+      if (rounds !== Infinity && (!Number.isSafeInteger(rounds) || rounds < 1)) throw new RangeError('Ungültige Rundenzahl');
+      this.rounds = rounds;
       this.mode = mode;
       this.count = count;
       this.repetitions = repetitions;
@@ -28,6 +30,10 @@
       }));
       this.pairs = [];
       this.schedule();
+    }
+
+    get finished() {
+      return this.people.every((person) => person.completedCycles >= this.rounds);
     }
 
     target(person) {
@@ -72,7 +78,7 @@
 
     wakeWaiting() {
       for (const person of this.people) {
-        if (!['idle', 'waiting'].includes(person.phase)) continue;
+        if (!['idle', 'waiting'].includes(person.phase) || person.completedCycles >= this.rounds) continue;
         const predecessor = (person.id - this.direction + this.count) % this.count;
         const required = person.completedCycles + (person.id === this.starter ? 0 : 1);
         const predecessorHasPassed = person.received[predecessor] >= required;
@@ -87,6 +93,7 @@
 
     advance() {
       this.events = [];
+      if (this.finished) return;
       // Keep the homecoming visible for at least one state before a new tour.
       for (const person of this.people) {
         if (person.phase === 'returning') person.phase = 'waiting';

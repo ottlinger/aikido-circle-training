@@ -80,6 +80,44 @@ for (const mode of ['nage', 'uke']) {
     }
   });
 
+  test(`${mode}: finite sessions finish exactly the selected rounds for every participant`, () => {
+    for (let count = 3; count <= 20; count++) {
+      for (const direction of [1, -1]) {
+        for (const repetitions of [2, 4]) {
+          for (const rounds of [1, 2, 3, 5, 10]) {
+            const sim = new CircleTraining({ count, direction, repetitions, rounds, starter: count - 1, mode });
+            for (let tick = 0; tick < 12000 && !sim.finished; tick++) {
+              checkPairs(sim);
+              sim.advance();
+              assert.ok(sim.people.every((person) => person.completedCycles <= rounds), 'no extra tours');
+              assert.ok(sim.events.every((event) => event.cycle <= rounds));
+            }
+            assert.equal(sim.finished, true, 'finite session must not deadlock');
+            assert.ok(sim.people.every((person) => person.completedCycles === rounds));
+            assert.ok(sim.people.every((person) => person.received.every((amount, id) => id === person.id || amount === rounds)));
+            assert.equal(sim.completedPairs, count * (count - 1) * rounds);
+            assert.equal(sim.totalThrows, count * (count - 1) * rounds * repetitions);
+            assert.deepEqual(sim.pairs, []);
+            const finalState = JSON.stringify(sim);
+            sim.advance();
+            assert.deepEqual(sim.events, []);
+            // Advancing after completion cannot change counters or participant positions.
+            const previous = JSON.parse(finalState);
+            previous.events = [];
+            assert.deepEqual(JSON.parse(JSON.stringify(sim)), previous);
+          }
+        }
+      }
+    }
+  });
+
+  test(`${mode}: explicit unlimited sessions continue past ten rounds`, () => {
+    const sim = new CircleTraining({ count: 3, mode, rounds: Infinity });
+    for (let tick = 0; tick < 1000; tick++) sim.advance();
+    assert.equal(sim.finished, false);
+    assert.ok(sim.people.every((person) => person.completedCycles > 10));
+  });
+
   test(`${mode}: finishing a tour waits for incoming partners or the next predecessor signal`, () => {
     const sim = new CircleTraining({ count: 8, mode });
     let sawWaiting = false;
@@ -182,4 +220,8 @@ test('Nage is the default; invalid settings are rejected', () => {
   assert.throws(() => new CircleTraining({ direction: 0 }), RangeError);
   assert.throws(() => new CircleTraining({ starter: 8 }), RangeError);
   assert.throws(() => new CircleTraining({ mode: 'invalid' }), RangeError);
+  assert.equal(new CircleTraining().rounds, Infinity);
+  for (const rounds of [0, -1, 1.5, NaN, -Infinity, '2', null, Number.MAX_SAFE_INTEGER + 1]) {
+    assert.throws(() => new CircleTraining({ rounds }), RangeError);
+  }
 });

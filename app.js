@@ -84,12 +84,13 @@
 
   function render() {
     updateCircleText();
-    $('status').textContent = t(running ? 'statusRunning' : simulation.totalThrows ? 'statusPaused' : 'statusReady');
-    $('play').textContent = t(running ? 'playPause' : simulation.totalThrows ? 'playResume' : 'playStart');
-    $('step').disabled = running;
+    $('status').textContent = t(simulation.finished ? 'statusFinished' : running ? 'statusRunning' : simulation.totalThrows ? 'statusPaused' : 'statusReady');
+    $('play').textContent = t(simulation.finished ? 'playRestart' : running ? 'playPause' : simulation.totalThrows ? 'playResume' : 'playStart');
+    $('step').disabled = running || simulation.finished;
     $('throws-stat').textContent = translator.number(simulation.totalThrows);
     $('pairs-stat').textContent = translator.number(simulation.completedPairs);
-    $('cycles-stat').textContent = translator.number(Math.min(...simulation.people.map((person) => person.completedCycles)));
+    const currentRound = Math.min(simulation.rounds, Math.min(...simulation.people.map((person) => person.completedCycles)) + 1);
+    $('cycles-stat').textContent = `${translator.number(currentRound)} / ${simulation.rounds === Infinity ? '∞' : translator.number(simulation.rounds)}`;
     const layout = circleLayout(simulation);
     const attacking = simulation.mode === 'uke';
     const unit = t(attacking ? 'unitAttacks' : 'unitThrows');
@@ -100,13 +101,15 @@
     $('starter-progress').textContent = t('starterProgress', {
       id: starter.id + 1, role: attacking ? 'Uke' : 'Nage', unit, ...starterProgress,
     });
-    $('starter-state').textContent = starter.phase === 'ready'
-      ? t('starterMoving', { cycle: starter.completedCycles + 1, partner: simulation.target(starter) + 1 })
-      : t('starterWaiting', { role: nextRole, partner: simulation.incomingMover(starter) + 1 });
+    $('starter-state').textContent = simulation.finished ? t('trainingFinished')
+      : starter.completedCycles >= simulation.rounds ? t('starterRoundsComplete')
+      : starter.phase === 'ready'
+        ? t('starterMoving', { cycle: starter.completedCycles + 1, partner: simulation.target(starter) + 1 })
+        : t('starterWaiting', { role: nextRole, partner: simulation.incomingMover(starter) + 1 });
     document.documentElement.style.setProperty('--move-duration', `${Math.min(450, 600 / Number($('speed').value))}ms`);
     $('connections').replaceChildren();
     $('current-pairs').replaceChildren();
-    if (!layout.pairs.length) $('current-pairs').textContent = t('pairsReturning');
+    if (!layout.pairs.length) $('current-pairs').textContent = t(simulation.finished ? 'trainingFinished' : 'pairsReturning');
     for (const pair of layout.pairs) {
       const from = layout.people[pair.mover];
       const to = layout.people[pair.partner];
@@ -177,7 +180,9 @@
       const detail = document.createElement('div');
       detail.className = 'progress-detail';
       const received = person.received.filter((amount, id) => id !== person.id && amount >= Math.max(1, person.completedCycles)).length;
-      detail.textContent = person.phase === 'waiting' || person.phase === 'returning'
+      detail.textContent = person.completedCycles >= simulation.rounds
+        ? t('ownRoundsComplete', { cycles: person.completedCycles, state: labels[currentRole] })
+        : person.phase === 'waiting' || person.phase === 'returning'
         ? t('personWaiting', { state: labels[currentRole], received, count: simulation.count - 1, action: passedAction, partner: simulation.incomingMover(person) + 1 })
         : person.phase === 'idle' ? t('personIdle', { state: labels[currentRole] })
         : t('personRound', { cycle: person.completedCycles + 1, state: labels[currentRole] });
@@ -199,10 +204,15 @@
     clearTimeout(timer);
     if (!running) return;
     timer = setTimeout(() => {
-      simulation.advance();
-      render();
+      advance();
       queueTick();
     }, 900 / Number($('speed').value));
+  }
+
+  function advance() {
+    simulation.advance();
+    if (simulation.finished) pause();
+    render();
   }
 
   function pause() {
@@ -219,6 +229,7 @@
       direction: Number($('direction').value),
       starter: Number($('starter').value),
       mode: $('mode').value,
+      rounds: Number($('rounds').value),
     });
     buildCircle();
     render();
@@ -227,13 +238,14 @@
   $('play').addEventListener('click', () => {
     if (running) pause();
     else {
+      if (simulation.finished) reset();
       running = true;
       document.body.classList.add('running');
       queueTick();
     }
     render();
   });
-  $('step').addEventListener('click', () => { simulation.advance(); render(); });
+  $('step').addEventListener('click', advance);
   $('reset').addEventListener('click', reset);
   $('randomize').addEventListener('click', () => {
     $('count').value = randomCount();
@@ -241,7 +253,7 @@
     reset();
   });
   $('count').addEventListener('input', () => { updateStarters(); reset(); });
-  for (const id of ['direction', 'repetitions', 'starter', 'mode']) $(id).addEventListener('change', reset);
+  for (const id of ['direction', 'repetitions', 'starter', 'mode', 'rounds']) $(id).addEventListener('change', reset);
   $('speed').addEventListener('input', () => { $('speed-value').textContent = `${translator.number(Number($('speed').value))}×`; queueTick(); });
   $('language').addEventListener('change', () => {
     translator = KeikoI18n.createTranslator($('language').value);
