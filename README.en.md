@@ -71,11 +71,13 @@ GitHub has no separate repository avatar field. To set the preview image, open *
 - `app.js`: browser controls, language switching and SVG animation
 - `tests/simulation.test.cjs`, `tests/visualization.test.cjs`, `tests/i18n.test.cjs`, `tests/app.test.cjs`: dependency-free tests
 
-With Node.js 18 or newer:
+With Node.js 18 or newer and npm:
 
 ```sh
-node --test tests/*.test.cjs
+npm test
 ```
+
+No `npm install` or build step is needed: the tests use Node.js built-in modules only. The `package.json` is private and provides development metadata and the test command; the app still runs by opening `index.html` directly.
 
 The GitHub Action `.github/workflows/tests.yml` checks JavaScript syntax and runs every test on **Node.js 18, 22 and 24** for each push and pull request. It can also be started manually. The badge at the top shows the actual test status on `main`, turning green after a successful run.
 

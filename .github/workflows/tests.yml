@@ -34,4 +34,4 @@ jobs:
             node --check "$file"
           done
       - name: Run all tests
-        run: node --test tests/*.test.cjs
+        run: npm test

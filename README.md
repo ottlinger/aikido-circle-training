@@ -69,11 +69,13 @@ GitHub hat kein separates Repository-Avatar-Feld. Für das Vorschaubild den Repo
 - `app.js`: Browsersteuerung, Sprachwechsel und SVG-Animation
 - `tests/simulation.test.cjs`, `tests/visualization.test.cjs`, `tests/i18n.test.cjs`, `tests/app.test.cjs`: Tests ohne zusätzliche Abhängigkeiten
 
-Mit Node.js (18 oder neuer):
+Mit Node.js (18 oder neuer) und npm:
 
 ```sh
-node --test tests/*.test.cjs
+npm test
 ```
+
+Weder `npm install` noch ein Build-Schritt ist nötig: Die Tests verwenden ausschließlich integrierte Node.js-Module. Die `package.json` ist als privat markiert und enthält Entwicklungsmetadaten sowie den Testbefehl; die App lässt sich weiterhin durch direktes Öffnen der `index.html` starten.
 
 Die GitHub Action `.github/workflows/tests.yml` prüft bei jedem Push und Pull Request die JavaScript-Syntax und führt sämtliche Tests auf **Node.js 18, 22 und 24** aus. Sie kann auch manuell gestartet werden. Das Badge oben zeigt den tatsächlichen Status der Tests auf `main` – grün nach einem erfolgreichen Lauf.
 
